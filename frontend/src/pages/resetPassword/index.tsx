@@ -5,9 +5,9 @@ import { useRouter } from "next/router"; // Importar useRouter para capturar o t
 
 import Head from "next/head";
 import Image from "next/image";
-import styles from '../../../styles/Home.module.scss'
+import styles from "../../../styles/Home.module.scss";
 
-import logoImg from '../../../public/logo.svg';
+import logoImg from "../../../public/logo.svg";
 
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
@@ -16,44 +16,49 @@ import { AuthContext } from "../../contexts/AuthContext";
 import { toast } from "react-toastify";
 
 export default function ResetPassword() {
-    const {resetPass} = useContext(AuthContext);
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+  const { resetPass } = useContext(AuthContext);
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const router = useRouter();
-    const { token } = router.query;  // Extrair o token da URL
-    
-    async function handleResetPassword(event: FormEvent){
-        event.preventDefault();
+  const router = useRouter();
+  const { token } = router.query; // Extrair o token da URL
 
-        if(password === ''){
-            toast.error("Preencha sua nova senha.")
-            return;
-        }
+  async function handleResetPassword(event: FormEvent) {
+    event.preventDefault();
 
-        if (!token) {
-          toast.error("Token de redefinição não encontrado.");
-          return;
-      }
-
-        setLoading(true);
-
-        try {
-          let data = {
-              password,
-              token // Incluindo o token no objeto data
-          };
-
-          await resetPass(data);
-
-          setLoading(false);
-      } catch (err) {
-          toast.error("Erro ao redefinir senha.");
-          console.error(err);
-          setLoading(false);
-      }
-
+    if (password === "" || password2 === "") {
+      toast.error("Preencha sua nova senha.");
+      return;
     }
+
+    if (password !== password2) {
+      toast.error("Informe a mesma senha para redefinição.");
+      return;
+    }
+
+    if (!token) {
+      toast.error("Token de redefinição não encontrado.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      let data = {
+        password,
+        token, // Incluindo o token no objeto data
+      };
+
+      await resetPass(data);
+
+      setLoading(false);
+    } catch (err) {
+      toast.error("Erro ao redefinir senha.");
+      console.error(err);
+      setLoading(false);
+    }
+  }
 
   return (
     <>
@@ -61,10 +66,10 @@ export default function ResetPassword() {
         <title>Redefinir senha!</title>
       </Head>
       <div className={styles.containerCenter}>
-        <Image src={logoImg} alt="Logo Pizzaria "/>
+        <Image src={logoImg} alt="Logo Pizzaria " />
 
         <div className={styles.login}>
-            <h1>Informe a nova senha.</h1>
+          <h1>Informe a nova senha.</h1>
 
           <form onSubmit={handleResetPassword}>
             <Input
@@ -73,19 +78,20 @@ export default function ResetPassword() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            
-            <Button
-              type="submit"
-              loading={loading}
-            >
-              Enviar
-            </Button>            
 
+            <Input
+              placeholder="Senha"
+              type="password"
+              value={password2}
+              onChange={(e) => setPassword2(e.target.value)}
+            />
+
+            <Button type="submit" loading={loading}>
+              Enviar
+            </Button>
           </form>
         </div>
-
       </div>
-
     </>
-  )
+  );
 }
